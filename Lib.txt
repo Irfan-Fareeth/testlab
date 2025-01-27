@@ -1,0 +1,161 @@
+import java.util.*;
+
+class Book {
+    private String title;
+    private String author;
+    private String category;
+    private boolean isBorrowed;
+    private Queue<Member> reservationQueue;
+
+    public Book(String title, String author, String category) {
+        this.title = title;
+        this.author = author;
+        this.category = category;
+        this.isBorrowed = false;
+        this.reservationQueue = new LinkedList<>();
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public boolean isBorrowed() {
+        return isBorrowed;
+    }
+
+    public void borrowBook(Member member) {
+        if (isBorrowed) {
+            reservationQueue.add(member);
+            System.out.println(member.getName() + " has been added to the reservation queue for " + title);
+        } else {
+            isBorrowed = true;
+            System.out.println(member.getName() + " borrowed " + title);
+        }
+    }
+
+    public void returnBook() {
+        isBorrowed = false;
+        if (!reservationQueue.isEmpty()) {
+            Member nextMember = reservationQueue.poll();
+            System.out.println(nextMember.getName() + " can now borrow " + title);
+        } else {
+            System.out.println(title + " is now available.");
+        }
+    }
+}
+
+class Member {
+    private String name;
+    private Map<Book, Date> borrowedBooks;
+
+    public Member(String name) {
+        this.name = name;
+        this.borrowedBooks = new HashMap<>();
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void borrowBook(Book book) {
+        if (!book.isBorrowed()) {
+            borrowedBooks.put(book, new Date());
+            book.borrowBook(this);
+        } else {
+            System.out.println(book.getTitle() + " is currently borrowed. Reserving the book.");
+            book.borrowBook(this);
+        }
+    }
+
+    public void returnBook(Book book) {
+        if (borrowedBooks.containsKey(book)) {
+            borrowedBooks.remove(book);
+            book.returnBook();
+        }
+    }
+
+    public double calculateFine(Book book) {
+        Date dueDate = borrowedBooks.get(book);
+        if (dueDate == null) return 0;
+
+        long overdueDays = (new Date().getTime() - dueDate.getTime()) / (1000 * 60 * 60 * 24) - 14; // Assuming a 14-day due period
+        return Math.max(overdueDays, 0) * 2.0; // $2 per overdue day
+    }
+}
+
+class DigitalLibrarySystem {
+    private List<Book> books;
+    private List<Member> members;
+
+    public DigitalLibrarySystem() {
+        this.books = new ArrayList<>();
+        this.members = new ArrayList<>();
+    }
+
+    public void addBook(Book book) {
+        books.add(book);
+    }
+
+    public void addMember(Member member) {
+        members.add(member);
+    }
+
+    public void recommendBooks(String category) {
+        System.out.println("Books in the " + category + " category:");
+        for (Book book : books) {
+            if (book.getCategory().equalsIgnoreCase(category)) {
+                System.out.println(book.getTitle());
+            }
+        }
+    }
+}
+
+class EBook extends Book {
+    private String downloadLink;
+
+    public EBook(String title, String author, String category, String downloadLink) {
+        super(title, author, category);
+        this.downloadLink = downloadLink;
+    }
+
+    public String getDownloadLink() {
+        return downloadLink;
+    }
+
+    public void accessEBook() {
+        System.out.println("Accessing eBook: " + getTitle());
+        System.out.println("Download link: " + downloadLink);
+    }
+}
+
+public class Main {
+    public static void main(String[] args) {
+        DigitalLibrarySystem library = new DigitalLibrarySystem();
+
+        Book book1 = new Book("The Great Gatsby", "F. Scott Fitzgerald", "Fiction");
+        Book book2 = new Book("1984", "George Orwell", "Fiction");
+        EBook ebook = new EBook("Java Programming", "John Doe", "Technology", "https://example.com/java");
+
+        Member member1 = new Member("Alice");
+        Member member2 = new Member("Bob");
+
+        library.addBook(book1);
+        library.addBook(book2);
+        library.addBook(ebook);
+        library.addMember(member1);
+        library.addMember(member2);
+
+        member1.borrowBook(book1);
+        member2.borrowBook(book1);
+
+        member1.returnBook(book1);
+        library.recommendBooks("Fiction");
+
+        member1.borrowBook(ebook);
+        ((EBook) ebook).accessEBook();
+    }
+}
