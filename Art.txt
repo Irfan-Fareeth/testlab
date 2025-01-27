@@ -1,0 +1,183 @@
+import java.util.*;
+
+class Artwork {
+    private String title;
+    private String artist;
+    private String category; // Sculpture, Painting, etc.
+    private String theme; // Abstract, Realism, etc.
+    private boolean isSold;
+
+    public Artwork(String title, String artist, String category, String theme) {
+        this.title = title;
+        this.artist = artist;
+        this.category = category;
+        this.theme = theme;
+        this.isSold = false;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public String getTheme() {
+        return theme;
+    }
+
+    public boolean isSold() {
+        return isSold;
+    }
+
+    public void sell() {
+        this.isSold = true;
+    }
+
+    @Override
+    public String toString() {
+        return "Artwork: " + title + " by " + artist + ", Category: " + category + ", Theme: " + theme;
+    }
+}
+
+class Auction {
+    private Artwork artwork;
+    private double currentBid;
+    private Customer highestBidder;
+
+    public Auction(Artwork artwork) {
+        this.artwork = artwork;
+        this.currentBid = 0;
+        this.highestBidder = null;
+    }
+
+    public void placeBid(double bid, Customer customer) {
+        if (bid > currentBid) {
+            currentBid = bid;
+            highestBidder = customer;
+            System.out.println(customer.getName() + " placed a bid of " + bid + " for " + artwork.getTitle());
+        } else {
+            System.out.println("Bid is too low.");
+        }
+    }
+
+    public void finalizeAuction() {
+        if (highestBidder != null) {
+            artwork.sell();
+            System.out.println(highestBidder.getName() + " won the auction for " + artwork.getTitle() + " with a bid of " + currentBid);
+        } else {
+            System.out.println("No bids were placed for " + artwork.getTitle());
+        }
+    }
+}
+
+class Customer {
+    private String name;
+    private List<Artwork> purchasedArtworks;
+
+    public Customer(String name) {
+        this.name = name;
+        this.purchasedArtworks = new ArrayList<>();
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void buyArtwork(Artwork artwork) {
+        if (!artwork.isSold()) {
+            purchasedArtworks.add(artwork);
+            artwork.sell();
+            System.out.println(name + " bought the artwork: " + artwork.getTitle());
+        } else {
+            System.out.println("Artwork " + artwork.getTitle() + " is already sold.");
+        }
+    }
+
+    public List<Artwork> getPurchasedArtworks() {
+        return purchasedArtworks;
+    }
+}
+
+class Exhibition {
+    private String name;
+    private Date startDate;
+    private Date endDate;
+    private List<Artwork> artworks;
+
+    public Exhibition(String name, Date startDate, Date endDate) {
+        this.name = name;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.artworks = new ArrayList<>();
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public void addArtwork(Artwork artwork) {
+        for (Exhibition exhibition : ExhibitionScheduler.getExhibitions()) {
+            if (exhibition != this && hasDateOverlap(exhibition, artwork)) {
+                System.out.println("Cannot add " + artwork.getTitle() + " to exhibition " + name + " due to date overlap.");
+                return;
+            }
+        }
+        artworks.add(artwork);
+        System.out.println("Artwork " + artwork.getTitle() + " added to exhibition " + name);
+    }
+
+    private boolean hasDateOverlap(Exhibition exhibition, Artwork artwork) {
+        return (this.startDate.before(exhibition.getEndDate()) && this.endDate.after(exhibition.getStartDate()));
+    }
+}
+
+class ExhibitionScheduler {
+    private static List<Exhibition> exhibitions = new ArrayList<>();
+
+    public static void addExhibition(Exhibition exhibition) {
+        exhibitions.add(exhibition);
+    }
+
+    public static List<Exhibition> getExhibitions() {
+        return exhibitions;
+    }
+
+    public static void displayExhibitions() {
+        for (Exhibition exhibition : exhibitions) {
+            System.out.println("Exhibition: " + exhibition.getName() + ", Start: " + exhibition.getStartDate() + ", End: " + exhibition.getEndDate());
+        }
+    }
+}
+
+public class ArtGallerySystem {
+    public static void main(String[] args) {
+        Artwork artwork1 = new Artwork("Starry Night", "Vincent van Gogh", "Painting", "Post-Impressionism");
+        Artwork artwork2 = new Artwork("David", "Michelangelo", "Sculpture", "Renaissance");
+        Customer customer1 = new Customer("Alice");
+        Customer customer2 = new Customer("Bob");
+
+        Auction auction1 = new Auction(artwork1);
+        auction1.placeBid(5000, customer1);
+        auction1.placeBid(6000, customer2);
+        auction1.finalizeAuction();
+
+        customer1.buyArtwork(artwork2);
+
+        Exhibition exhibition1 = new Exhibition("Impressionism Exhibition", new GregorianCalendar(2025, Calendar.MARCH, 1).getTime(),
+                new GregorianCalendar(2025, Calendar.MARCH, 15).getTime());
+        ExhibitionScheduler.addExhibition(exhibition1);
+        exhibition1.addArtwork(artwork1); // Will fail due to auction
+
+        ExhibitionScheduler.displayExhibitions();
+    }
+}
