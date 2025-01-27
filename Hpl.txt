@@ -1,0 +1,246 @@
+import java.util.*;
+
+class Patient {
+    private String name;
+    private int age;
+    private String appointmentDate;
+
+    public Patient(String name, int age) {
+        this.name = name;
+        this.age = age;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAppointmentDate(String appointmentDate) {
+        this.appointmentDate = appointmentDate;
+    }
+
+    public String getAppointmentDate() {
+        return appointmentDate;
+    }
+}
+
+class EmergencyPatient extends Patient {
+    private String severityLevel;
+    private int priority;
+
+    public EmergencyPatient(String name, int age, String severityLevel, int priority) {
+        super(name, age);
+        this.severityLevel = severityLevel;
+        this.priority = priority;
+    }
+
+    public String getSeverityLevel() {
+        return severityLevel;
+    }
+
+    public int getPriority() {
+        return priority;
+    }
+}
+
+class Prescription {
+    private String medicineName;
+    private String dosage;
+    private String duration;
+
+    public Prescription(String medicineName, String dosage, String duration) {
+        this.medicineName = medicineName;
+        this.dosage = dosage;
+        this.duration = duration;
+    }
+
+    public String getMedicineName() {
+        return medicineName;
+    }
+
+    public String getDosage() {
+        return dosage;
+    }
+
+    public String getDuration() {
+        return duration;
+    }
+
+    @Override
+    public String toString() {
+        return medicineName + " (" + dosage + ", " + duration + ")";
+    }
+}
+
+class Appointment {
+    private Patient patient;
+    private Doctor doctor;
+    private String appointmentDate;
+
+    public Appointment(Patient patient, Doctor doctor, String appointmentDate) {
+        this.patient = patient;
+        this.doctor = doctor;
+        this.appointmentDate = appointmentDate;
+    }
+
+    public Patient getPatient() {
+        return patient;
+    }
+
+    public Doctor getDoctor() {
+        return doctor;
+    }
+
+    public String getAppointmentDate() {
+        return appointmentDate;
+    }
+
+    @Override
+    public String toString() {
+        return "Appointment with Dr. " + doctor.getName() + " on " + appointmentDate + " for " + patient.getName();
+    }
+}
+
+class Doctor {
+    private String name;
+    private Set<String> specializations;
+    private Map<String, List<Appointment>> schedule;
+
+    public Doctor(String name, Set<String> specializations) {
+        this.name = name;
+        this.specializations = specializations;
+        this.schedule = new HashMap<>();
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Set<String> getSpecializations() {
+        return specializations;
+    }
+
+    public boolean isAvailable(String appointmentDate) {
+        return !schedule.containsKey(appointmentDate) || schedule.get(appointmentDate).size() < 5;
+    }
+
+    public void bookAppointment(Appointment appointment) {
+        schedule.putIfAbsent(appointment.getAppointmentDate(), new ArrayList<>());
+        schedule.get(appointment.getAppointmentDate()).add(appointment);
+    }
+
+    public boolean isSpecializedIn(String specialization) {
+        return specializations.contains(specialization);
+    }
+}
+
+class HospitalManagementSystem {
+    private List<Doctor> doctors;
+    private List<Patient> patients;
+
+    public HospitalManagementSystem() {
+        this.doctors = new ArrayList<>();
+        this.patients = new ArrayList<>();
+    }
+
+    public void addDoctor(Doctor doctor) {
+        doctors.add(doctor);
+    }
+
+    public void addPatient(Patient patient) {
+        patients.add(patient);
+    }
+
+    public Appointment scheduleAppointment(Patient patient, String doctorName, String appointmentDate, String specialization) {
+        Doctor doctor = findDoctor(doctorName, specialization);
+        if (doctor != null && doctor.isAvailable(appointmentDate)) {
+            Appointment appointment = new Appointment(patient, doctor, appointmentDate);
+            doctor.bookAppointment(appointment);
+            return appointment;
+        } else {
+            System.out.println("Doctor is not available or does not specialize in the requested field.");
+            return null;
+        }
+    }
+
+    public Appointment scheduleEmergencyAppointment(EmergencyPatient patient, String appointmentDate) {
+        EmergencyPatient emergencyPatient = (EmergencyPatient) patient;
+        Doctor doctor = findAvailableDoctorForEmergency(patient, appointmentDate);
+        if (doctor != null && doctor.isAvailable(appointmentDate)) {
+            Appointment appointment = new Appointment(emergencyPatient, doctor, appointmentDate);
+            doctor.bookAppointment(appointment);
+            return appointment;
+        } else {
+            System.out.println("No doctor available for emergency appointment.");
+            return null;
+        }
+    }
+
+    private Doctor findDoctor(String doctorName, String specialization) {
+        for (Doctor doctor : doctors) {
+            if (doctor.getName().equalsIgnoreCase(doctorName) && doctor.isSpecializedIn(specialization)) {
+                return doctor;
+            }
+        }
+        return null;
+    }
+
+    private Doctor findAvailableDoctorForEmergency(EmergencyPatient patient, String appointmentDate) {
+        // Prioritize based on severityLevel and availability
+        for (Doctor doctor : doctors) {
+            if (doctor.isAvailable(appointmentDate)) {
+                return doctor;
+            }
+        }
+        return null;
+    }
+
+    public void printAllAppointments() {
+        for (Doctor doctor : doctors) {
+            System.out.println("Dr. " + doctor.getName() + "'s Appointments:");
+            for (String date : doctor.schedule.keySet()) {
+                for (Appointment appointment : doctor.schedule.get(date)) {
+                    System.out.println(appointment);
+                }
+            }
+        }
+    }
+}
+
+public class HospitalManagementMain {
+    public static void main(String[] args) {
+        // Create hospital system
+        HospitalManagementSystem system = new HospitalManagementSystem();
+
+        // Create doctors and their specializations
+        Set<String> cardiology = new HashSet<>(Arrays.asList("Cardiology", "General Medicine"));
+        Set<String> neurology = new HashSet<>(Arrays.asList("Neurology", "General Medicine"));
+
+        Doctor doctor1 = new Doctor("Dr. Smith", cardiology);
+        Doctor doctor2 = new Doctor("Dr. Johnson", neurology);
+
+        system.addDoctor(doctor1);
+        system.addDoctor(doctor2);
+
+        // Create patients
+        Patient patient1 = new Patient("Alice", 30);
+        EmergencyPatient emergencyPatient1 = new EmergencyPatient("Bob", 40, "Critical", 1);
+
+        system.addPatient(patient1);
+        system.addPatient(emergencyPatient1);
+
+        // Schedule appointments
+        Appointment appointment1 = system.scheduleAppointment(patient1, "Dr. Smith", "2025-02-15", "Cardiology");
+        Appointment emergencyAppointment1 = system.scheduleEmergencyAppointment(emergencyPatient1, "2025-02-10");
+
+        // Create and link prescriptions
+        Prescription prescription1 = new Prescription("Aspirin", "100mg", "7 days");
+        Prescription prescription2 = new Prescription("Lisinopril", "10mg", "14 days");
+
+        // Output all appointments
+        system.printAllAppointments();
+    }
+}
