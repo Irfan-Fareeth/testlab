@@ -1,0 +1,164 @@
+import java.util.*;
+
+// Base Account Class
+abstract class Account {
+    private String accountNumber;
+    private double balance;
+    private List<Transaction> transactionHistory;
+
+    public Account(String accountNumber, double initialBalance) {
+        this.accountNumber = accountNumber;
+        this.balance = initialBalance;
+        this.transactionHistory = new ArrayList<>();
+    }
+
+    public String getAccountNumber() {
+        return accountNumber;
+    }
+
+    public double getBalance() {
+        return balance;
+    }
+
+    protected void setBalance(double balance) {
+        this.balance = balance;
+    }
+
+    public void deposit(double amount) {
+        balance += amount;
+        transactionHistory.add(new Transaction(UUID.randomUUID().toString(), "Deposit", amount, new Date()));
+        System.out.println("Deposit of " + amount + " successful.");
+    }
+
+    public boolean withdraw(double amount) {
+        if (balance >= amount) {
+            balance -= amount;
+            transactionHistory.add(new Transaction(UUID.randomUUID().toString(), "Withdrawal", amount, new Date()));
+            System.out.println("Withdrawal of " + amount + " successful.");
+            return true;
+        } else {
+            System.out.println("Insufficient balance.");
+            return false;
+        }
+    }
+
+    public void printTransactionHistory() {
+        System.out.println("Transaction History for Account " + accountNumber + ":");
+        for (Transaction transaction : transactionHistory) {
+            System.out.println(transaction);
+        }
+    }
+
+    public abstract void calculateMonthlyInterest();
+}
+
+// Transaction Class
+class Transaction {
+    private String transactionID;
+    private String type;
+    private double amount;
+    private Date date;
+
+    public Transaction(String transactionID, String type, double amount, Date date) {
+        this.transactionID = transactionID;
+        this.type = type;
+        this.amount = amount;
+        this.date = date;
+    }
+
+    @Override
+    public String toString() {
+        return "TransactionID: " + transactionID + ", Type: " + type + ", Amount: " + amount + ", Date: " + date;
+    }
+}
+
+// SavingsAccount Class with Interest Calculation
+class SavingsAccount extends Account {
+    private double interestRate;
+
+    public SavingsAccount(String accountNumber, double initialBalance, double interestRate) {
+        super(accountNumber, initialBalance);
+        this.interestRate = interestRate;
+    }
+
+    @Override
+    public void calculateMonthlyInterest() {
+        double interest = getBalance() * (interestRate / 100);
+        setBalance(getBalance() + interest);
+        System.out.println("Monthly interest of " + interest + " added to account " + getAccountNumber() + ".");
+    }
+}
+
+// CurrentAccount Class with Overdraft Protection
+class CurrentAccount extends Account {
+    private double overdraftLimit;
+
+    public CurrentAccount(String accountNumber, double initialBalance, double overdraftLimit) {
+        super(accountNumber, initialBalance);
+        this.overdraftLimit = overdraftLimit;
+    }
+
+    @Override
+    public boolean withdraw(double amount) {
+        if (getBalance() + overdraftLimit >= amount) {
+            setBalance(getBalance() - amount);
+            System.out.println("Withdrawal of " + amount + " successful. Overdraft limit considered.");
+            return true;
+        } else {
+            System.out.println("Overdraft limit exceeded. Withdrawal denied.");
+            return false;
+        }
+    }
+
+    @Override
+    public void calculateMonthlyInterest() {
+        System.out.println("No interest calculation for Current Account.");
+    }
+}
+
+// FixedDepositAccount Class (Example of Polymorphism)
+class FixedDepositAccount extends Account {
+    private double interestRate;
+    private int termInMonths;
+
+    public FixedDepositAccount(String accountNumber, double initialBalance, double interestRate, int termInMonths) {
+        super(accountNumber, initialBalance);
+        this.interestRate = interestRate;
+        this.termInMonths = termInMonths;
+    }
+
+    @Override
+    public void calculateMonthlyInterest() {
+        double interest = getBalance() * (interestRate / 100) / 12;
+        setBalance(getBalance() + interest);
+        System.out.println("Monthly interest of " + interest + " added to Fixed Deposit account " + getAccountNumber() + ".");
+    }
+}
+
+// Main Class to Test
+public class BankManagementSystem {
+    public static void main(String[] args) {
+        // Create different accounts
+        SavingsAccount savingsAccount = new SavingsAccount("S001", 1000.0, 4.0);
+        CurrentAccount currentAccount = new CurrentAccount("C001", 500.0, 300.0);
+        FixedDepositAccount fixedDepositAccount = new FixedDepositAccount("F001", 10000.0, 5.0, 12);
+
+        // Deposit, Withdraw, and Calculate Interest
+        System.out.println("Savings Account:");
+        savingsAccount.deposit(500);
+        savingsAccount.withdraw(300);
+        savingsAccount.calculateMonthlyInterest();
+        savingsAccount.printTransactionHistory();
+
+        System.out.println("\nCurrent Account:");
+        currentAccount.deposit(200);
+        currentAccount.withdraw(600); // Within overdraft limit
+        currentAccount.withdraw(1000); // Exceeds overdraft limit
+        currentAccount.calculateMonthlyInterest();
+        currentAccount.printTransactionHistory();
+
+        System.out.println("\nFixed Deposit Account:");
+        fixedDepositAccount.calculateMonthlyInterest();
+        fixedDepositAccount.printTransactionHistory();
+    }
+}
