@@ -1,0 +1,157 @@
+import java.util.*;
+
+class Student {
+    private String name;
+    private List<Course> enrolledCourses;
+    private static final int MAX_COURSES = 5; // Maximum courses a student can enroll in
+
+    public Student(String name) {
+        this.name = name;
+        this.enrolledCourses = new ArrayList<>();
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public List<Course> getEnrolledCourses() {
+        return enrolledCourses;
+    }
+
+    public boolean enrollInCourse(Course course) {
+        if (enrolledCourses.size() >= MAX_COURSES) {
+            System.out.println("Cannot enroll in more than " + MAX_COURSES + " courses.");
+            return false;
+        }
+        if (enrolledCourses.contains(course)) {
+            System.out.println("Already enrolled in the course: " + course.getCourseName());
+            return false;
+        }
+        enrolledCourses.add(course);
+        System.out.println("Successfully enrolled in " + course.getCourseName());
+        return true;
+    }
+
+    public boolean dropCourse(Course course) {
+        if (enrolledCourses.contains(course)) {
+            enrolledCourses.remove(course);
+            System.out.println("Successfully dropped the course: " + course.getCourseName());
+            return true;
+        } else {
+            System.out.println("You are not enrolled in this course: " + course.getCourseName());
+            return false;
+        }
+    }
+}
+
+class Course {
+    private String courseName;
+    private String courseCode;
+
+    public Course(String courseName, String courseCode) {
+        this.courseName = courseName;
+        this.courseCode = courseCode;
+    }
+
+    public String getCourseName() {
+        return courseName;
+    }
+
+    public String getCourseCode() {
+        return courseCode;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Course course = (Course) obj;
+        return Objects.equals(courseCode, course.courseCode); // Courses are considered equal if their course code is the same
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(courseCode); // Ensure hashcode is based on the course code
+    }
+
+    @Override
+    public String toString() {
+        return courseName + " (" + courseCode + ")";
+    }
+}
+
+class CollegeManagementSystem {
+    private List<Student> students;
+    private List<Course> availableCourses;
+
+    public CollegeManagementSystem() {
+        this.students = new ArrayList<>();
+        this.availableCourses = new ArrayList<>();
+    }
+
+    public void addStudent(Student student) {
+        students.add(student);
+    }
+
+    public void addCourse(Course course) {
+        availableCourses.add(course);
+    }
+
+    public Course getCourseByCode(String courseCode) {
+        for (Course course : availableCourses) {
+            if (course.getCourseCode().equals(courseCode)) {
+                return course;
+            }
+        }
+        return null;
+    }
+
+    public void printStudentCourses(Student student) {
+        System.out.println(student.getName() + "'s Enrolled Courses:");
+        for (Course course : student.getEnrolledCourses()) {
+            System.out.println(course);
+        }
+    }
+}
+
+public class CollegeManagementMain {
+    public static void main(String[] args) {
+        // Create courses
+        Course course1 = new Course("Mathematics", "MATH101");
+        Course course2 = new Course("Physics", "PHY101");
+        Course course3 = new Course("Chemistry", "CHEM101");
+        Course course4 = new Course("Computer Science", "CS101");
+        Course course5 = new Course("Biology", "BIO101");
+        Course course6 = new Course("English", "ENG101");
+
+        // Create college system and add courses
+        CollegeManagementSystem collegeSystem = new CollegeManagementSystem();
+        collegeSystem.addCourse(course1);
+        collegeSystem.addCourse(course2);
+        collegeSystem.addCourse(course3);
+        collegeSystem.addCourse(course4);
+        collegeSystem.addCourse(course5);
+        collegeSystem.addCourse(course6);
+
+        // Create a student
+        Student student1 = new Student("Alice");
+
+        // Enroll in courses
+        student1.enrollInCourse(course1);
+        student1.enrollInCourse(course2);
+        student1.enrollInCourse(course3);
+        student1.enrollInCourse(course4);
+        student1.enrollInCourse(course5); // Maximum reached
+        student1.enrollInCourse(course6); // Exceeds maximum limit
+
+        // Drop a course
+        student1.dropCourse(course3); // Successfully drops Chemistry
+        student1.dropCourse(course6); // Not enrolled in English
+
+        // Enroll again after dropping a course
+        student1.enrollInCourse(course6); // Successfully enrolls in English
+
+        // Print enrolled courses
+        collegeSystem.printStudentCourses(student1);
+    }
+}
