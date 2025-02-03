@@ -1,0 +1,65 @@
+// Base class
+class User {
+    String name;
+    String email;
+
+    User(String name, String email) {
+        this.name = name;
+        this.email = email;
+    }
+}
+
+// Subclass
+class Customer extends User {
+    ShoppingCart shoppingCart;
+
+    Customer(String name, String email) {
+        super(name, email);
+        this.shoppingCart = new ShoppingCart();
+    }
+}
+
+class Product {
+    int productID;
+    String name;
+    double price;
+
+    Product(int productID, String name, double price) {
+        this.productID = productID;
+        this.name = name;
+        this.price = price;
+    }
+}
+
+class ShoppingCart {
+    List<Product> products;
+
+    ShoppingCart() {
+        products = new ArrayList<>();
+    }
+
+    void addProduct(Product product) {
+        products.add(product);
+    }
+
+    double calculateTotal() {
+        double total = 0;
+        for (Product product : products) {
+            total += product.price;
+        }
+        return total;
+    }
+}
+
+class Order {
+    List<Product> products;
+
+    Order() {
+        products = new ArrayList<>();
+    }
+
+    void addProduct(Product product) {
+        products.add(product);
+    }
+}
+
