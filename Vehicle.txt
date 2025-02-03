@@ -1,0 +1,76 @@
+class Vehicle {
+    String brand;
+    int speed;
+    String fuelType;
+
+    Vehicle(String brand, int speed, String fuelType) {
+        this.brand = brand;
+        this.speed = speed;
+        this.fuelType = fuelType;
+    }
+
+    void displayDetails() {
+        System.out.println("Brand: " + brand + ", Speed: " + speed + " km/h, Fuel Type: " + fuelType);
+    }
+}
+
+// Subclasses
+class Car extends Vehicle {
+    int doors;
+
+    Car(String brand, int speed, String fuelType, int doors) {
+        super(brand, speed, fuelType);
+        this.doors = doors;
+    }
+
+    @Override
+    void displayDetails() {
+        super.displayDetails();
+        System.out.println("Doors: " + doors);
+    }
+}
+
+class ElectricCar extends Car {
+    int batteryCapacity;
+
+    ElectricCar(String brand, int speed, String fuelType, int doors, int batteryCapacity) {
+        super(brand, speed, fuelType, doors);
+        this.batteryCapacity = batteryCapacity;
+    }
+
+    @Override
+    void displayDetails() {
+        super.displayDetails();
+        System.out.println("Battery Capacity: " + batteryCapacity + " kWh");
+    }
+}
+
+class Bike extends Vehicle {
+    boolean hasABS;
+
+    Bike(String brand, int speed, String fuelType, boolean hasABS) {
+        super(brand, speed, fuelType);
+        this.hasABS = hasABS;
+    }
+
+    @Override
+    void displayDetails() {
+        super.displayDetails();
+        System.out.println("ABS: " + hasABS);
+    }
+}
+
+class Truck extends Vehicle {
+    double loadCapacity;
+
+    Truck(String brand, int speed, String fuelType, double loadCapacity) {
+        super(brand, speed, fuelType);
+        this.loadCapacity = loadCapacity;
+    }
+
+    @Override
+    void displayDetails() {
+        super.displayDetails();
+        System.out.println("Load Capacity: " + loadCapacity + " tons");
+    }
+}
