@@ -1,0 +1,99 @@
+interface RemoteControl {
+    void adjustSettings();
+}
+
+class SmartDevice implements RemoteControl {
+    int deviceID;
+    boolean status; // true for ON, false for OFF
+    double powerConsumption;
+
+    SmartDevice(int deviceID, boolean status, double powerConsumption) {
+        this.deviceID = deviceID;
+        this.status = status;
+        this.powerConsumption = powerConsumption;
+    }
+
+    void turnOn() {
+        status = true;
+        System.out.println("Device is turned ON");
+    }
+
+    void turnOff() {
+        status = false;
+        System.out.println("Device is turned OFF");
+    }
+
+    @Override
+    public void adjustSettings() {
+        // Adjust settings for the smart device
+    }
+}
+
+class Light extends SmartDevice {
+    Light(int deviceID, boolean status, double powerConsumption) {
+        super(deviceID, status, powerConsumption);
+    }
+
+    @Override
+    void turnOn() {
+        super.turnOn();
+        System.out.println("Light is on");
+    }
+
+    @Override
+    void turnOff() {
+        super.turnOff();
+        System.out.println("Light is off");
+    }
+
+    @Override
+    public void adjustSettings() {
+        System.out.println("Adjusting light settings");
+    }
+}
+
+class Fan extends SmartDevice {
+    Fan(int deviceID, boolean status, double powerConsumption) {
+        super(deviceID, status, powerConsumption);
+    }
+
+    @Override
+    void turnOn() {
+        super.turnOn();
+        System.out.println("Fan is on");
+    }
+
+    @Override
+    void turnOff() {
+        super.turnOff();
+        System.out.println("Fan is off");
+    }
+
+    @Override
+    public void adjustSettings() {
+        System.out.println("Adjusting fan speed");
+    }
+}
+
+class AirConditioner extends SmartDevice {
+    AirConditioner(int deviceID, boolean status, double powerConsumption) {
+        super(deviceID, status, powerConsumption);
+    }
+
+    @Override
+    void turnOn() {
+        super.turnOn();
+        System.out.println("Air conditioner is on");
+    }
+
+    @Override
+    void turnOff() {
+        super.turnOff();
+        System.out.println("Air conditioner is off");
+    }
+
+    @Override
+    public void adjustSettings() {
+        System.out.println("Adjusting temperature settings");
+    }
+}
