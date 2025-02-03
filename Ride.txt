@@ -1,0 +1,65 @@
+class Ride {
+    String driver;
+    String passenger;
+    double fare;
+
+    Ride(String driver, String passenger, double fare) {
+        this.driver = driver;
+        this.passenger = passenger;
+        this.fare = fare;
+    }
+
+    double calculateFare() {
+        return fare;
+    }
+}
+
+class EconomyRide extends Ride {
+    EconomyRide(String driver, String passenger, double fare) {
+        super(driver, passenger, fare);
+    }
+
+    @Override
+    double calculateFare() {
+        return super.calculateFare() * 0.8; // 20% discount for economy rides
+    }
+}
+
+class LuxuryRide extends Ride {
+    LuxuryRide(String driver, String passenger, double fare) {
+        super(driver, passenger, fare);
+    }
+
+    @Override
+    double calculateFare() {
+        return super.calculateFare() * 1.5; // 50% surcharge for luxury rides
+    }
+}
+
+class SharedRide extends Ride {
+    SharedRide(String driver, String passenger, double fare) {
+        super(driver, passenger, fare);
+    }
+
+    @Override
+    double calculateFare() {
+        return super.calculateFare() * 0.5; // 50% discount for shared rides
+    }
+}
+
+class RideBookingSystem {
+    List<Ride> rides;
+
+    RideBookingSystem() {
+        rides = new ArrayList<>();
+    }
+
+    void addRide(Ride ride) {
+        rides.add(ride);
+    }
+
+    Ride assignRide(String passenger, String rideType) {
+        // Implementation to assign a ride based on ride type and availability
+        return null; // Placeholder for actual implementation
+    }
+}
