@@ -1,0 +1,1108 @@
+1) college management system
+
+import java.util.*;
+
+class Student {
+    private String name;
+    private String rollNo;
+    private ArrayList<Course> enrolledCourses;
+
+    public Student(String name, String rollNo) {
+        this.name = name;
+        this.rollNo = rollNo;
+        this.enrolledCourses = new ArrayList<>();
+    }
+
+    public void enrollInCourse(Course course) {
+        for (Course c : enrolledCourses) {
+            if (c.getCourseName().equals(course.getCourseName())) {
+                System.out.println(name + " is already enrolled in " + course.getCourseName());
+                return;
+            }
+        }
+        if (enrolledCourses.size() < 5) {
+            enrolledCourses.add(course);
+            System.out.println(name + " successfully enrolled in " + course.getCourseName());
+        } else {
+            System.out.println("Only 5 courses permitted!");
+        }
+    }
+
+    public void dropCourse(Course course) {
+        if (enrolledCourses.remove(course)) {
+            System.out.println(name + " dropped the course: " + course.getCourseName());
+        } else {
+            System.out.println(name + " is not enrolled in " + course.getCourseName());
+        }
+    }
+
+    public void displayDetails() {
+        System.out.println("Student: " + name + " | Roll No: " + rollNo);
+        System.out.println("Enrolled Courses:");
+        for (Course c : enrolledCourses) {
+            System.out.println("- " + c.getCourseName() + " (Teacher: " + (c.getTeacher() != null ? c.getTeacher().getName() : "None") + ")");
+        }
+    }
+
+    public String getRollNo() {
+        return rollNo;
+    }
+}
+
+class Teacher {
+    private String name;
+    private String employeeID;
+    private ArrayList<Course> assignedCourses;
+
+    public Teacher(String name, String employeeID) {
+        this.name = name;
+        this.employeeID = employeeID;
+        this.assignedCourses = new ArrayList<>();
+    }
+
+    public void assignCourse(Course course) {
+        for (Course c : assignedCourses) {
+            if (c.getCourseName().equals(course.getCourseName())) {
+                System.out.println(course.getCourseName() + " is already assigned to " + name);
+                return;
+            }
+        }
+        if (assignedCourses.size() < 3) {
+            assignedCourses.add(course);
+            course.setTeacher(this);
+            System.out.println(name + " assigned to " + course.getCourseName());
+        } else {
+            System.out.println("Only 3 courses permitted!");
+        }
+    }
+
+    public void displayDetails() {
+        System.out.println("Teacher: " + name + " | Employee ID: " + employeeID);
+        System.out.println("Assigned Courses:");
+        for (Course c : assignedCourses) {
+            System.out.println("- " + c.getCourseName());
+        }
+    }
+
+    public String getName() {
+        return name;
+    }
+}
+
+class Course {
+    private String courseName;
+    private String courseCode;
+    private Teacher teacher;
+
+    public Course(String courseName, String courseCode) {
+        this.courseName = courseName;
+        this.courseCode = courseCode;
+    }
+
+    public void setTeacher(Teacher teacher) {
+        if (this.teacher != null) {
+            System.out.println(courseName + " is already assigned to " + this.teacher.getName());
+        } else {
+            this.teacher = teacher;
+        }
+    }
+
+    public Teacher getTeacher() {
+        return teacher;
+    }
+
+    public String getCourseName() {
+        return courseName;
+    }
+
+    public void displayDetails() {
+        System.out.println("Course: " + courseName + " | Code: " + courseCode + " | Teacher: " + (teacher != null ? teacher.getName() : "None"));
+    }
+}
+
+public class CollegeManagementSystem {
+    public static void main(String[] args) {
+        Scanner scan = new Scanner(System.in);
+        ArrayList<Student> students = new ArrayList<>();
+        ArrayList<Teacher> teachers = new ArrayList<>();
+        ArrayList<Course> courses = new ArrayList<>();
+
+        while (true) {
+            System.out.println("\n--- College Management System ---");
+            System.out.println("1) Add Student");
+            System.out.println("2) Add Teacher");
+            System.out.println("3) Add Course");
+            System.out.println("4) Enroll Student in Course");
+            System.out.println("5) Drop Student from Course");
+            System.out.println("6) Assign Teacher to Course");
+            System.out.println("7) Display Student Details");
+            System.out.println("8) Display Teacher Details");
+            System.out.println("9) Display Course Details");
+            System.out.println("10) Exit");
+            System.out.print("Enter choice: ");
+            int choice = scan.nextInt();
+            scan.nextLine();
+
+            switch (choice) {
+                case 1:
+                    System.out.print("Enter student name: ");
+                    String studentName = scan.nextLine();
+                    System.out.print("Enter roll number: ");
+                    String rollNo = scan.nextLine();
+                    students.add(new Student(studentName, rollNo));
+                    break;
+                case 2:
+                    System.out.print("Enter teacher name: ");
+                    String teacherName = scan.nextLine();
+                    System.out.print("Enter employee ID: ");
+                    String empID = scan.nextLine();
+                    teachers.add(new Teacher(teacherName, empID));
+                    break;
+                case 3:
+                    System.out.print("Enter course name: ");
+                    String courseName = scan.nextLine();
+                    System.out.print("Enter course code: ");
+                    String courseCode = scan.nextLine();
+                    courses.add(new Course(courseName, courseCode));
+                    break;
+                case 4:
+                    System.out.print("Enter student roll number: ");
+                    String rollEnroll = scan.nextLine();
+                    Student student = findStudent(students, rollEnroll);
+                    if (student == null) {
+                        System.out.println("Student not found.");
+                        break;
+                    }
+                    System.out.print("Enter course name: ");
+                    String enrollCourseName = scan.nextLine();
+                    Course enrollCourse = findCourse(courses, enrollCourseName);
+                    if (enrollCourse == null) {
+                        System.out.println("Course not found.");
+                        break;
+                    }
+                    student.enrollInCourse(enrollCourse);
+                    break;
+                case 5:
+                    System.out.print("Enter student roll number: ");
+                    String rollDrop = scan.nextLine();
+                    Student studentDrop = findStudent(students, rollDrop);
+                    if (studentDrop == null) {
+                        System.out.println("Student not found.");
+                        break;
+                    }
+                    System.out.print("Enter course name: ");
+                    String dropCourseName = scan.nextLine();
+                    Course dropCourse = findCourse(courses, dropCourseName);
+                    if (dropCourse == null) {
+                        System.out.println("Course not found.");
+                        break;
+                    }
+                    studentDrop.dropCourse(dropCourse);
+                    break;
+                case 6:
+                    System.out.print("Enter teacher name: ");
+                    String teacherAssignName = scan.nextLine();
+                    Teacher teacher = findTeacher(teachers, teacherAssignName);
+                    if (teacher == null) {
+                        System.out.println("Teacher not found.");
+                        break;
+                    }
+                    System.out.print("Enter course name: ");
+                    String assignCourseName = scan.nextLine();
+                    Course assignCourse = findCourse(courses, assignCourseName);
+                    if (assignCourse == null) {
+                        System.out.println("Course not found.");
+                        break;
+                    }
+                    teacher.assignCourse(assignCourse);
+                    break;
+                case 7:
+                    for (Student s : students) s.displayDetails();
+                    break;
+                case 8:
+                    for (Teacher t : teachers) t.displayDetails();
+                    break;
+                case 9:
+                    for (Course c : courses) c.displayDetails();
+                    break;
+                case 10:
+                    System.out.println("Exiting... Goodbye!");
+                    scan.close();
+                    return;
+                default:
+                    System.out.println("Invalid choice! Try again.");
+            }
+        }
+    }
+
+    private static Student findStudent(ArrayList<Student> students, String rollNo) {
+        for (Student s : students) {
+            if (s.getRollNo().equals(rollNo)) return s;
+        }
+        return null;
+    }
+
+    private static Teacher findTeacher(ArrayList<Teacher> teachers, String name) {
+        for (Teacher t : teachers) {
+            if (t.getName().equalsIgnoreCase(name)) return t;
+        }
+        return null;
+    }
+
+    private static Course findCourse(ArrayList<Course> courses, String name) {
+        for (Course c : courses) {
+            if (c.getCourseName().equalsIgnoreCase(name)) return c;
+        }
+        return null;
+    }
+}
+
+
+------
+
+2) bank management system
+
+
+import java.util.*;
+
+abstract class BankAccount {
+    protected String name;
+    protected double balance;
+    protected List<Transaction> transactions = new ArrayList<>();
+
+    public BankAccount(String name, double initialAmt) {
+        this.name = name;
+        this.balance = initialAmt;
+    }
+
+    public void deposit(double depositAmt) {
+        if (depositAmt < 0) {
+            System.out.println("Deposit amount should be positive!");
+        } else {
+            balance += depositAmt;
+            transactions.add(new Transaction("Deposit", depositAmt));
+            System.out.println("Successfully deposited amount: " + depositAmt);
+        }
+    }
+
+    public abstract void withdraw(double withdrawAmt);
+
+    public double getBalance() {
+        return balance;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void displayTransactionHistory() {
+        System.out.println("\nTransaction History for " + name + ":");
+        for (Transaction t : transactions) {
+            System.out.println(t);
+        }
+    }
+}
+
+class SavingsAccount extends BankAccount {
+    private double interestRate;
+
+    public SavingsAccount(String name, double initialAmt, double interestRate) {
+        super(name, initialAmt);
+        this.interestRate = interestRate;
+    }
+
+    public void applyInterest() {
+        double interest = balance * (interestRate / 100);
+        balance += interest;
+        transactions.add(new Transaction("Interest Applied", interest));
+        System.out.println("Interest applied: " + interest);
+    }
+
+    @Override
+    public void withdraw(double withdrawAmt) {
+        if (withdrawAmt > 0 && withdrawAmt <= balance) {
+            balance -= withdrawAmt;
+            transactions.add(new Transaction("Withdrawal", withdrawAmt));
+            System.out.println("Successfully withdrew amount: " + withdrawAmt);
+        } else {
+            System.out.println("Insufficient balance!");
+        }
+    }
+}
+
+class CurrentAccount extends BankAccount {
+    private double overdraftLimit;
+
+    public CurrentAccount(String name, double initialAmt, double overdraftLimit) {
+        super(name, initialAmt);
+        this.overdraftLimit = overdraftLimit;
+    }
+
+    @Override
+    public void withdraw(double withdrawAmt) {
+        if (withdrawAmt > 0 && balance + overdraftLimit >= withdrawAmt) {
+            balance -= withdrawAmt;
+            transactions.add(new Transaction("Withdrawal", withdrawAmt));
+            System.out.println("Successfully withdrew amount: " + withdrawAmt);
+        } else {
+            System.out.println("Withdrawal exceeds overdraft limit!");
+        }
+    }
+}
+
+class Transaction {
+    private static int transactionCounter = 1;
+    private int transactionID;
+    private String type;
+    private double amount;
+    private Date date;
+
+    public Transaction(String type, double amount) {
+        this.transactionID = transactionCounter++;
+        this.type = type;
+        this.amount = amount;
+        this.date = new Date();
+    }
+
+    @Override
+    public String toString() {
+        return "Transaction ID: " + transactionID + ", Type: " + type + ", Amount: " + amount + ", Date: " + date;
+    }
+}
+
+class BankSystem {
+    private HashMap<String, BankAccount> accounts = new HashMap<>();
+
+    public void createSavingsAccount(String name, double initialAmt, double interestRate) {
+        if (accounts.containsKey(name)) {
+            System.out.println("An account with this name already exists!");
+        } else {
+            accounts.put(name, new SavingsAccount(name, initialAmt, interestRate));
+            System.out.println("Savings Account created successfully for: " + name);
+        }
+    }
+
+    public void createCurrentAccount(String name, double initialAmt, double overdraftLimit) {
+        if (accounts.containsKey(name)) {
+            System.out.println("An account with this name already exists!");
+        } else {
+            accounts.put(name, new CurrentAccount(name, initialAmt, overdraftLimit));
+            System.out.println("Current Account created successfully for: " + name);
+        }
+    }
+
+    public void deleteAccount(String name) {
+        if (accounts.containsKey(name)) {
+            accounts.remove(name);
+            System.out.println("Account deleted successfully for: " + name);
+        } else {
+            System.out.println("No account found with the name: " + name);
+        }
+    }
+
+    public BankAccount getAccount(String name) {
+        return accounts.get(name);
+    }
+}
+
+public class BankManagementSystem {
+    public static void main(String[] args) {
+        Scanner scan = new Scanner(System.in);
+        BankSystem bankSystem = new BankSystem();
+
+        while (true) {
+            System.out.println("\n---Banking System---");
+            System.out.println("1) Create Savings Account");
+            System.out.println("2) Create Current Account");
+            System.out.println("3) Delete Account");
+            System.out.println("4) Access Account");
+            System.out.println("5) Exit");
+            int choice = scan.nextInt();
+            scan.nextLine();
+
+            switch (choice) {
+                case 1:
+                    System.out.println("Enter account holder name:");
+                    String name = scan.nextLine();
+                    System.out.println("Enter initial deposit amount:");
+                    double initialAmt = scan.nextDouble();
+                    System.out.println("Enter interest rate:");
+                    double interestRate = scan.nextDouble();
+                    bankSystem.createSavingsAccount(name, initialAmt, interestRate);
+                    break;
+                case 2:
+                    System.out.println("Enter account holder name:");
+                    String currName = scan.nextLine();
+                    System.out.println("Enter initial deposit amount:");
+                    double currInitialAmt = scan.nextDouble();
+                    System.out.println("Enter overdraft limit:");
+                    double overdraftLimit = scan.nextDouble();
+                    bankSystem.createCurrentAccount(currName, currInitialAmt, overdraftLimit);
+                    break;
+                case 3:
+                    System.out.println("Enter account holder name to delete:");
+                    String delName = scan.nextLine();
+                    bankSystem.deleteAccount(delName);
+                    break;
+                case 4:
+                    System.out.println("Enter account holder name:");
+                    String accName = scan.nextLine();
+                    BankAccount account = bankSystem.getAccount(accName);
+                    if (account != null) {
+                        accessAccount(scan, account);
+                    } else {
+                        System.out.println("No account found with the name: " + accName);
+                    }
+                    break;
+                case 5:
+                    System.out.println("Exiting... Goodbye!");
+                    scan.close();
+                    return;
+                default:
+                    System.out.println("Invalid choice! Please try again.");
+            }
+        }
+    }
+
+    public static void accessAccount(Scanner scan, BankAccount account) {
+        while (true) {
+            System.out.println("\n---Account Menu for " + account.getName() + "---");
+            System.out.println("1) Deposit Money");
+            System.out.println("2) Withdraw Money");
+            System.out.println("3) Check Balance");
+            System.out.println("4) View Transaction History");
+            if (account instanceof SavingsAccount) {
+                System.out.println("5) Apply Interest");
+            }
+            System.out.println("6) Back to Main Menu");
+            int choice = scan.nextInt();
+
+            switch (choice) {
+                case 1:
+                    System.out.println("Enter amount to deposit:");
+                    double depositAmt = scan.nextDouble();
+                    account.deposit(depositAmt);
+                    break;
+                case 2:
+                    System.out.println("Enter amount to withdraw:");
+                    double withdrawAmt = scan.nextDouble();
+                    account.withdraw(withdrawAmt);
+                    break;
+                case 3:
+                    System.out.println("Available balance: " + account.getBalance());
+                    break;
+                case 4:
+                    account.displayTransactionHistory();
+                    break;
+                case 5:
+                    if (account instanceof SavingsAccount) {
+                        ((SavingsAccount) account).applyInterest();
+                    }
+                    break;
+                case 6:
+                    return;
+                default:
+                    System.out.println("Invalid choice! Please try again.");
+            }
+        }
+    }
+}
+
+
+------
+3) library management system
+
+
+import java.util.*;
+class Book {
+    String title;
+    String isbn;
+    String category;
+    boolean isIssued = false;
+    Queue<Member> reservationQueue = new LinkedList<>();
+    Date dueDate;
+    Book(String title, String isbn, String category) {
+        this.title = title;
+        this.isbn = isbn;
+        this.category = category;
+    }
+    void issueBook(Member member) {
+        if (!isIssued) {
+            isIssued = true;
+            Calendar cal = Calendar.getInstance();
+            cal.add(Calendar.DAY_OF_MONTH, 14); // 2-week loan period
+            dueDate = cal.getTime();
+            System.out.println("Book '" + title + "' has been issued to " + member.name + " (Due: " + dueDate + ").");
+        } else {
+            System.out.println("Book '" + title + "' is already issued. Adding to reservation queue.");
+            reservationQueue.add(member);
+        }
+    }
+    void returnBook() {
+        if (isIssued) {
+            isIssued = false;
+            System.out.println("Book '" + title + "' has been returned.");
+            if (!reservationQueue.isEmpty()) {
+                Member nextMember = reservationQueue.poll();
+                System.out.println("Book is now issued to " + nextMember.name + " from reservation queue.");
+                issueBook(nextMember);
+            }
+        } else {
+            System.out.println("Book '" + title + "' was not issued.");
+        }
+    }
+    void displayDetails() {
+        System.out.println("Title: " + title);
+        System.out.println("ISBN: " + isbn);
+        System.out.println("Category: " + category);
+        System.out.println("Status: " + (isIssued ? "Issued" : "Available"));
+        if (!reservationQueue.isEmpty()) {
+            System.out.println("Reservations: " + reservationQueue.size() + " members waiting.");
+        }
+    }
+}
+class Member {
+    String name;
+    String memberId;
+    List<Book> borrowedBooks = new ArrayList<>();
+    Map<Book, Date> dueDates = new HashMap<>();
+    Member(String name, String memberId) {
+        this.name = name;
+        this.memberId = memberId;
+    }
+    void borrowBook(Book book) {
+        if (borrowedBooks.size() < 3) {
+            if (!book.isIssued) {
+                borrowedBooks.add(book);
+                book.issueBook(this);
+                dueDates.put(book, book.dueDate);
+            } else {
+                book.reservationQueue.add(this);
+                System.out.println("Book '" + book.title + "' is reserved for " + name + ".");
+            }
+        } else {
+            System.out.println("Member " + name + " cannot borrow more than 3 books.");
+        }
+    }
+    void returnBook(Book book) {
+        if (borrowedBooks.contains(book)) {
+            book.returnBook();
+            borrowedBooks.remove(book);
+            dueDates.remove(book);
+            suggestBooks(book);
+        } else {
+            System.out.println("Book '" + book.title + "' is not borrowed by " + name + ".");
+        }
+    }
+    void calculateFine() {
+        Date today = new Date();
+        int fine = 0;
+        for (Map.Entry<Book, Date> entry : dueDates.entrySet()) {
+            if (today.after(entry.getValue())) {
+                long overdueDays = (today.getTime() - entry.getValue().getTime()) / (1000 * 60 * 60 * 24);
+                fine += overdueDays * 2; // $2 per day
+            }
+        }
+        System.out.println("Total fine for " + name + ": $" + fine);
+    }
+    void suggestBooks(Book returnedBook) {
+        System.out.println("Suggested books in category '" + returnedBook.category + "':");
+        System.out.println("- Another great " + returnedBook.category + " book!");
+    }
+    void displayDetails() {
+        System.out.println("Name: " + name);
+        System.out.println("Member ID: " + memberId);
+        System.out.println("Borrowed Books: " + borrowedBooks.size());
+    }
+}
+class EBook extends Book {
+    String downloadLink;
+
+    EBook(String title, String isbn, String category, String downloadLink) {
+        super(title, isbn, category);
+        this.downloadLink = downloadLink;
+    }
+
+    void displayDetails() {
+        super.displayDetails();
+        System.out.println("Download Link: " + downloadLink);
+    }
+}
+class Librarian {
+    String name;
+    String employeeId;
+
+    Librarian(String name, String employeeId) {
+        this.name = name;
+        this.employeeId = employeeId;
+    }
+
+    void displayDetails() {
+        System.out.println("Librarian Name: " + name);
+        System.out.println("Employee ID: " + employeeId);
+    }
+}
+class LibraryBranch {
+    String branchName;
+    String location;
+
+    LibraryBranch(String branchName, String location) {
+        this.branchName = branchName;
+        this.location = location;
+    }
+
+    void displayDetails() {
+        System.out.println("Branch Name: " + branchName);
+        System.out.println("Location: " + location);
+    }
+}
+public class LibraryManagementSystem {
+    public static void main(String[] args) {
+        Book book1 = new Book("The Great Gatsby", "ISBN001", "Fiction");
+        Book book2 = new Book("1984", "ISBN002", "Dystopian");
+        Book book3 = new Book("To Kill a Mockingbird", "ISBN003", "Classic");
+        EBook ebook1 = new EBook("Digital Java Guide", "ISBN004", "Programming", "www.ebooks.com/java");
+
+        Member member1 = new Member("Alice", "M101");
+        Member member2 = new Member("Bob", "M102");
+        Member member3 = new Member("Charlie", "M103");
+        
+        Librarian librarian = new Librarian("Mr. Smith", "L001");
+
+        LibraryBranch branch = new LibraryBranch("Central Library", "Main Street, Springfield");
+
+        System.out.println("\n---- Borrowing Books ----");
+        member1.borrowBook(book1); 
+        member1.borrowBook(book2); 
+        member2.borrowBook(book1); 
+        member3.borrowBook(book3); 
+
+        System.out.println("\n---- Returning Books ----");
+        member1.returnBook(book1);  
+
+        System.out.println("\n---- Borrowing an EBook ----");
+        member2.borrowBook(ebook1);
+
+        System.out.println("\n---- Fine Calculation ----");
+        member1.calculateFine(); 
+
+        System.out.println("\n---- Library Details ----");
+
+        System.out.println("\nBooks:");
+        book1.displayDetails();
+        book2.displayDetails();
+        book3.displayDetails();
+        ebook1.displayDetails();
+
+        System.out.println("\nMembers:");
+        member1.displayDetails();
+        member2.displayDetails();
+        member3.displayDetails();
+
+        System.out.println("\nLibrarian:");
+        librarian.displayDetails();
+
+        System.out.println("\nLibrary Branch:");
+        branch.displayDetails();
+    }
+}
+
+
+---------
+
+4) art gallery management system
+
+import java.util.*;
+
+class Artwork {
+    String title, artistName, category, theme;
+    double price;
+    boolean isSold;
+
+    Artwork(String title, String artistName, double price, String category, String theme) {
+        this.title = title;
+        this.artistName = artistName;
+        this.price = price;
+        this.isSold = false;
+        this.category = category;
+        this.theme = theme;
+    }
+
+    void sellArtwork() {
+        if (!isSold) {
+            isSold = true;
+            System.out.println("Artwork '" + title + "' has been sold.");
+        } else {
+            System.out.println("Artwork '" + title + "' is already sold.");
+        }
+    }
+
+    void displayDetails() {
+        System.out.println("Title: " + title + "\nArtist: " + artistName + "\nPrice: $" + price + "\nCategory: " + category + "\nTheme: " + theme + "\nStatus: " + (isSold ? "Sold" : "Available"));
+    }
+}
+
+class Auction {
+    Artwork artwork;
+    double currentBid;
+    String highestBidder;
+
+    Auction(Artwork artwork) {
+        this.artwork = artwork;
+        this.currentBid = 0;
+        this.highestBidder = "No bids yet";
+    }
+
+    void placeBid(String bidder, double bidAmount) {
+        if (bidAmount > currentBid) {
+            currentBid = bidAmount;
+            highestBidder = bidder;
+            System.out.println(bidder + " placed a bid of $" + bidAmount + " on '" + artwork.title + "'.");
+        } else {
+            System.out.println("Bid too low! The current highest bid is $" + currentBid);
+        }
+    }
+
+    void displayAuctionDetails() {
+        System.out.println("Artwork: " + artwork.title + "\nCurrent Bid: $" + currentBid + "\nHighest Bidder: " + highestBidder);
+    }
+}
+
+class Customer {
+    String name, customerId;
+    ArrayList<Artwork> purchasedArtworks = new ArrayList<>();
+
+    Customer(String name, String customerId) {
+        this.name = name;
+        this.customerId = customerId;
+    }
+
+    void purchaseArtwork(Artwork artwork) {
+        if (!artwork.isSold) {
+            artwork.sellArtwork();
+            purchasedArtworks.add(artwork);
+        } else {
+            System.out.println("Artwork '" + artwork.title + "' is already sold.");
+        }
+    }
+
+    void displayDetails() {
+        System.out.println("Customer Name: " + name + "\nCustomer ID: " + customerId + "\nPurchased Artworks:");
+        for (Artwork artwork : purchasedArtworks) {
+            System.out.println(" - " + artwork.title);
+        }
+    }
+}
+
+class Exhibition {
+    String name, startDate, endDate;
+    ArrayList<Artwork> artworks = new ArrayList<>();
+
+    Exhibition(String name, String startDate, String endDate) {
+        this.name = name;
+        this.startDate = startDate;
+        this.endDate = endDate;
+    }
+
+    void addArtwork(Artwork artwork) {
+        if (!artwork.isSold) {
+            artworks.add(artwork);
+        } else {
+            System.out.println("Artwork '" + artwork.title + "' is sold and cannot be added to the exhibition.");
+        }
+    }
+
+    void displayDetails() {
+        System.out.println("Exhibition: " + name + "\nDuration: " + startDate + " to " + endDate + "\nArtworks in exhibition:");
+        for (Artwork artwork : artworks) {
+            System.out.println(" - " + artwork.title);
+        }
+    }
+}
+
+class Gallery {
+    String galleryName, location;
+    ArrayList<Artwork> artworks = new ArrayList<>();
+    HashMap<String, ArrayList<Artwork>> categories = new HashMap<>();
+
+    Gallery(String galleryName, String location) {
+        this.galleryName = galleryName;
+        this.location = location;
+    }
+
+    void addArtwork(Artwork artwork) {
+        artworks.add(artwork);
+        categories.putIfAbsent(artwork.category, new ArrayList<>());
+        categories.get(artwork.category).add(artwork);
+    }
+
+    void displayArtworksByCategory(String category) {
+        System.out.println("Artworks in category: " + category);
+        for (Artwork artwork : categories.getOrDefault(category, new ArrayList<>())) {
+            System.out.println(" - " + artwork.title);
+        }
+    }
+
+    void displayDetails() {
+        System.out.println("Gallery Name: " + galleryName + "\nLocation: " + location);
+    }
+}
+
+public class ArtGalleryManagementSystem {
+    public static void main(String[] args) {
+    	Artwork artwork1 = new Artwork("Starry Night", "Vincent van Gogh", 1000000, "Painting", "Impressionism");
+        Artwork artwork2 = new Artwork("Mona Lisa", "Leonardo da Vinci", 850000, "Painting", "Renaissance");
+        Artwork artwork3 = new Artwork("The Persistence of Memory", "Salvador Dali", 600000, "Painting", "Surrealism");
+        Artwork artwork4 = new Artwork("The Thinker", "Auguste Rodin", 500000, "Sculpture", "Realism");
+
+        Customer customer1 = new Customer("Alice", "C001");
+        Customer customer2 = new Customer("Bob", "C002");
+
+        Gallery gallery = new Gallery("Art Enthusiasts Gallery", "Downtown, Springfield");
+        gallery.addArtwork(artwork1);
+        gallery.addArtwork(artwork2);
+        gallery.addArtwork(artwork3);
+        gallery.addArtwork(artwork4);
+
+        customer1.purchaseArtwork(artwork1);
+        customer2.purchaseArtwork(artwork2);
+        customer2.purchaseArtwork(artwork4);
+
+        customer1.purchaseArtwork(artwork1);
+
+        Auction auction = new Auction(artwork3);
+        auction.placeBid("Alice", 650000);
+        auction.placeBid("Bob", 700000);
+        auction.displayAuctionDetails();
+
+        Exhibition exhibition = new Exhibition("Modern Art Week", "2025-06-10", "2025-06-20");
+        exhibition.addArtwork(artwork3); 
+        exhibition.addArtwork(artwork1); 
+        exhibition.displayDetails();
+        gallery.displayDetails();
+        gallery.displayArtworksByCategory("Painting");
+        gallery.displayArtworksByCategory("Sculpture");
+        customer1.displayDetails();
+        customer2.displayDetails();
+    }
+}
+
+------
+
+5) hospital management system
+
+
+import java.util.*;
+
+class Patient {
+    String name, patientId, diagnosis;
+    int age;
+
+    Patient(String name, String patientId, int age, String diagnosis) {
+        this.name = name;
+        this.patientId = patientId;
+        this.age = age;
+        this.diagnosis = diagnosis;
+    }
+
+    void displayPatientDetails() {
+        System.out.println("Patient Name: " + name);
+        System.out.println("Patient ID: " + patientId);
+        System.out.println("Age: " + age);
+        System.out.println("Diagnosis: " + diagnosis);
+    }
+
+    void updateDiagnosis(String newDiagnosis) {
+        this.diagnosis = newDiagnosis;
+        System.out.println("Diagnosis for " + name + " updated to: " + newDiagnosis);
+    }
+
+    void updateAge(int newAge) {
+        this.age = newAge;
+        System.out.println("Age for " + name + " updated to: " + newAge);
+    }
+}
+
+class EmergencyPatient extends Patient {
+    int severityLevel, priority;
+
+    EmergencyPatient(String name, String patientId, int age, String diagnosis, int severityLevel, int priority) {
+        super(name, patientId, age, diagnosis);
+        this.severityLevel = severityLevel;
+        this.priority = priority;
+    }
+
+    void displayEmergencyDetails() {
+        displayPatientDetails();
+        System.out.println("Severity Level: " + severityLevel);
+        System.out.println("Priority: " + priority);
+    }
+}
+
+class Doctor {
+    String name, doctorId;
+    List<String> specializations;
+    Map<String, String> schedule = new HashMap<>();
+
+    Doctor(String name, String doctorId, String... specializations) {
+        this.name = name;
+        this.doctorId = doctorId;
+        this.specializations = Arrays.asList(specializations);
+    }
+
+    void displayDoctorDetails() {
+        System.out.println("Doctor Name: " + name);
+        System.out.println("Doctor ID: " + doctorId);
+        System.out.println("Specializations: " + String.join(", ", specializations));
+    }
+
+    void updateSpecialization(String... newSpecializations) {
+        this.specializations = Arrays.asList(newSpecializations);
+        System.out.println("Specializations for " + name + " updated.");
+    }
+
+    void addAvailability(String date, String time) {
+        schedule.put(date, time);
+    }
+
+    boolean isAvailable(String date) {
+        return schedule.containsKey(date);
+    }
+}
+
+class Prescription {
+    String medicineName, dosage, duration;
+
+    Prescription(String medicineName, String dosage, String duration) {
+        this.medicineName = medicineName;
+        this.dosage = dosage;
+        this.duration = duration;
+    }
+
+    void displayPrescription() {
+        System.out.println("Medicine: " + medicineName + ", Dosage: " + dosage + ", Duration: " + duration);
+    }
+}
+
+class Appointment {
+    Patient patient;
+    Doctor doctor;
+    String date, time;
+    boolean isCancelled = false;
+    Prescription prescription;
+
+    Appointment(Patient patient, Doctor doctor, String date, String time) {
+        this.patient = patient;
+        this.doctor = doctor;
+        this.date = date;
+        this.time = time;
+    }
+
+    void displayAppointmentDetails() {
+        if (!isCancelled) {
+            System.out.println("\nAppointment Details:");
+            patient.displayPatientDetails();
+            doctor.displayDoctorDetails();
+            System.out.println("Date: " + date);
+            System.out.println("Time: " + time);
+            if (prescription != null) {
+                System.out.print("Prescription: ");
+                prescription.displayPrescription();
+            }
+        } else {
+            System.out.println("\nAppointment for " + patient.name + " with Dr. " + doctor.name + " is cancelled.");
+        }
+    }
+
+    void cancelAppointment() {
+        isCancelled = true;
+        System.out.println("Appointment for " + patient.name + " with Dr. " + doctor.name + " has been cancelled.");
+    }
+
+    void rescheduleAppointment(String newDate, String newTime) {
+        if (doctor.isAvailable(newDate)) {
+            this.date = newDate;
+            this.time = newTime;
+            System.out.println("Appointment rescheduled to " + newDate + " at " + newTime);
+        } else {
+            System.out.println("Doctor is unavailable on " + newDate);
+        }
+    }
+
+    void assignPrescription(Prescription prescription) {
+        this.prescription = prescription;
+        System.out.println("Prescription assigned to " + patient.name);
+    }
+}
+
+class Hospital {
+    String hospitalName, hospitalLocation;
+
+    Hospital(String hospitalName, String hospitalLocation) {
+        this.hospitalName = hospitalName;
+        this.hospitalLocation = hospitalLocation;
+    }
+
+    void displayHospitalDetails() {
+        System.out.println("\nHospital Name: " + hospitalName);
+        System.out.println("Hospital Location: " + hospitalLocation);
+    }
+
+    void updateHospitalLocation(String newLocation) {
+        this.hospitalLocation = newLocation;
+        System.out.println("Hospital location updated to: " + newLocation);
+    }
+}
+
+public class HospitalManagementSystem {
+    public static void main(String[] args) {
+        
+        Hospital hospital = new Hospital("City Hospital", "Downtown");
+        hospital.displayHospitalDetails();
+
+        
+        Doctor doctor1 = new Doctor("Dr. Smith", "D101", "Cardiology", "Neurology");
+        Doctor doctor2 = new Doctor("Dr. Johnson", "D102", "Orthopedics", "Sports Medicine");
+
+
+        doctor1.addAvailability("2025-02-10", "10:00 AM");
+        doctor2.addAvailability("2025-02-15", "2:00 PM");
+
+        doctor1.displayDoctorDetails();
+        doctor2.displayDoctorDetails();
+
+        Patient patient1 = new Patient("Alice", "P101", 45, "Heart Disease");
+        EmergencyPatient patient2 = new EmergencyPatient("Bob", "P102", 60, "Stroke", 5, 1);
+
+        patient1.displayPatientDetails();
+        patient2.displayEmergencyDetails();
+
+        Appointment appointment1 = new Appointment(patient1, doctor1, "2025-02-10", "10:00 AM");
+        Appointment appointment2 = new Appointment(patient2, doctor2, "2025-02-15", "2:00 PM");
+
+        appointment1.displayAppointmentDetails();
+        appointment2.displayAppointmentDetails();
+
+        patient1.updateDiagnosis("Arterial Blockage");
+        patient1.updateAge(46);
+
+        doctor2.updateSpecialization("Orthopedics", "Sports Medicine", "Physiotherapy");
+
+        Prescription prescription1 = new Prescription("Aspirin", "75mg", "1 month");
+        Prescription prescription2 = new Prescription("Ibuprofen", "200mg", "2 weeks");
+
+        appointment1.assignPrescription(prescription1);
+        appointment2.assignPrescription(prescription2);
+
+        appointment1.rescheduleAppointment("2025-02-12", "1:00 PM");
+
+        appointment2.rescheduleAppointment("2025-02-20", "3:00 PM");
+
+        appointment2.cancelAppointment();
+
+        appointment1.displayAppointmentDetails();
+        appointment2.displayAppointmentDetails();
+    }
+}
+
+
