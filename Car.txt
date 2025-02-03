@@ -1,0 +1,69 @@
+class Car {
+    String registrationNumber;
+    String model;
+    double rentalPrice;
+
+    Car(String registrationNumber, String model, double rentalPrice) {
+        this.registrationNumber = registrationNumber;
+        this.model = model;
+        this.rentalPrice = rentalPrice;
+    }
+
+    double calculateRentalCost(int days) {
+        return days * rentalPrice;
+    }
+}
+
+class EconomyCar extends Car {
+    EconomyCar(String registrationNumber, String model, double rentalPrice) {
+        super(registrationNumber, model, rentalPrice);
+    }
+
+    @Override
+    double calculateRentalCost(int days) {
+        return super.calculateRentalCost(days) * 0.9; // 10% discount for economy cars
+    }
+}
+
+class SUV extends Car {
+    SUV(String registrationNumber, String model, double rentalPrice) {
+        super(registrationNumber, model, rentalPrice);
+    }
+
+    @Override
+    double calculateRentalCost(int days) {
+        return super.calculateRentalCost(days) * 1.2; // 20% surcharge for SUVs
+    }
+}
+
+class LuxuryCar extends Car {
+    LuxuryCar(String registrationNumber, String model, double rentalPrice) {
+        super(registrationNumber, model, rentalPrice);
+    }
+
+    @Override
+    double calculateRentalCost(int days) {
+        return super.calculateRentalCost(days) * 1.5; // 50% surcharge for luxury cars
+    }
+}
+
+class RentalSystem {
+    List<Car> cars;
+
+    RentalSystem() {
+        cars = new ArrayList<>();
+    }
+
+    void addCar(Car car) {
+        cars.add(car);
+    }
+
+    Car bookCar(String registrationNumber) {
+        for (Car car : cars) {
+            if (car.registrationNumber.equals(registrationNumber)) {
+                return car;
+            }
+        }
+        return null;
+    }
+}
